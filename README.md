@@ -42,7 +42,3 @@ in this repository in the near future:
  
 **Space Telescope Science Institute (STScI)**  
 http://www.stsci.edu  
-
-
-
-Tommy...
