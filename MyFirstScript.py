@@ -8,6 +8,7 @@ __version__ = 0.2
 import numpy as np
 import pylab as pl
 import argparse as ap
+import pdb
 
 def mkplot(outfile,xx,yy1,yy2,yy3,yy4,ylab='Slope Unc. [e-/s]'):
 
@@ -28,6 +29,8 @@ if __name__=='__main__':
 	parser.add_argument('-f', '--file', default='Gordon2005_Fig16.txt', \
 	  type=str, help='Input file.')
 	options = parser.parse_args()
+ 	
+ 	pdb.set_trace()
  	
 	infile = options.file
 	slope_outfile = 'fig16_slope.pdf'
