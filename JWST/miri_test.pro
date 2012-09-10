@@ -70,15 +70,70 @@ pro miri_test
 
   ;subtract the first frame from all the others
   frame1 = data[*,*,0]
-  sub_data = data
+  sub_data = data   ;create a copy to preserve original cube
   
   for ii=0, n_elements(xcoo)-1 do begin
     sub_data[*,*,ii] = data[*,*,ii] - frame1 
   endfor  
 
-stop
+  ;find the slope from line fitting for every pixel
+  working_data = data
+  xdim = sxpar(hdr, 'NAXIS1')
+  ydim = sxpar(hdr, 'NAXIS2')
+  t_frames = sxpar(hdr, 'NAXIS3')
 
+print
+help, frame1, /struc
+print
+stop, xdim, ydim, t_frames
+
+  ;create an 2D array to hold the final slope image
+  slope_data = make_array(xdim, ydim, /float, val=0.)
+
+t = systime(1)
+
+  ;ignore the 1st and last frames due to weird effects,
+  ;and calculate slope. Load the slope array.
+  for jj=0, ydim - 1 do begin
+    for ii=0, xdim - 1 do begin
+      coeff = linfit(xtime[1:-2], sub_data[ii,jj,1:t_frames-2], sigma=sig)
+      slope_data[ii,jj] = coeff[1]
+
+;********** Test Area **********      
+;ytest = coeff[0] + coeff[1]*xtime      
+
+;yupper = max(data[ii,jj,*])
+;ylower = min(sub_data[ii,jj,*])
+
+;set_plot, 'x'
+;!p.multi = 0
+;window, 1, xsize=500, ysize=500, xpos=1500
+;plot, xtime, sub_data[ii,jj,*], yr=[ylower,yupper]
+;oplot, xtime, data[ii,jj,*], color=cgcolor('red')
+;oplot, xtime, ytest, linestyle=1, thick=2,color=cgColor('Gold')
+;print, 'x: ', strtrim(string(ii),2), ' y: ', strtrim(string(jj),2)
+;wait, .5
+;********** Test Area **********      
+      
+    endfor
+  endfor     
+  
+  ;write the final slope image to a FITS file
+  slope_file = save_path+'slope_img.fits'
+  mwrfits, slope_data, slope_file, /lscale 
+  
+  print, 'Median = ',  strtrim(string(median(slope_data),2)), ' counts/frame.'
+  print, 'Average = ', strtrim(string(avg(slope_data)), 2), ' counts/frame.'
+  print, 'Stand. Dev. = ', strtrim(string(stddev(slope_data)),2), ' counts/frame.'
+  
+  set_plot, 'x'
+  !p.multi = 0
+  window, 1, xsize=500, ysize=500, xpos=1500
+  plothist, slope_data
+
+  print
+  print, 'Time to complete slope calcs. fits: ', systime(1)-t, ' secs.'
   print, 'Script done!'
 
-  ;stop
+
 end
