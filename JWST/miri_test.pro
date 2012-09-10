@@ -82,11 +82,6 @@ pro miri_test
   ydim = sxpar(hdr, 'NAXIS2')
   t_frames = sxpar(hdr, 'NAXIS3')
 
-print
-help, frame1, /struc
-print
-stop, xdim, ydim, t_frames
-
   ;create an 2D array to hold the final slope image
   slope_data = make_array(xdim, ydim, /float, val=0.)
 
@@ -96,7 +91,8 @@ t = systime(1)
   ;and calculate slope. Load the slope array.
   for jj=0, ydim - 1 do begin
     for ii=0, xdim - 1 do begin
-      coeff = linfit(xtime[1:-2], sub_data[ii,jj,1:t_frames-2], sigma=sig)
+;      coeff = linfit(xcoo[1:-2], sub_data[ii,jj,1:t_frames-2], sigma=sig)
+      coeff = linfit(xcoo, sub_data[ii,jj,*], sigma=sig)
       slope_data[ii,jj] = coeff[1]
 
 ;********** Test Area **********      
@@ -122,18 +118,23 @@ t = systime(1)
   slope_file = save_path+'slope_img.fits'
   mwrfits, slope_data, slope_file, /lscale 
   
-  print, 'Median = ',  strtrim(string(median(slope_data),2)), ' counts/frame.'
+  print
+  print, 'Median = ', strtrim(string(median(slope_data)), 2), ' counts/frame.'
   print, 'Average = ', strtrim(string(avg(slope_data)), 2), ' counts/frame.'
   print, 'Stand. Dev. = ', strtrim(string(stddev(slope_data)),2), ' counts/frame.'
   
-  set_plot, 'x'
-  !p.multi = 0
-  window, 1, xsize=500, ysize=500, xpos=1500
-  plothist, slope_data
+  ;set_plot, 'x'
+  ;!p.multi = 0
+  ;window, 1, xsize=500, ysize=500, xpos=1500
+  
+  sp, 0, 1, /eps, file=save_path+'miri_histogram', plotsize = [6,6,1,1]
+  plothist, slope_data, xhist, yhist, xtit='Pixel counts/frame', ytit='Frequency (Normalized to 1)', peak=1
 
   print
   print, 'Time to complete slope calcs. fits: ', systime(1)-t, ' secs.'
   print, 'Script done!'
+  
+  device, /close
 
 
 end
