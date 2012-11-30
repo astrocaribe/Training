@@ -21,18 +21,15 @@ repository:
 
 * Archive
 * IDL
+* JWST
+* Photometry
 * Python
 * Spectroscopy
+* Final Project
 
-
-##Future Includes
-*****************
-The following are the training modules that I expect to include  
-in this repository in the near future:
-
-* AstroDrizzle
-* Photometry
-* JWST
+##Updates:
+**********
+* Added JWST, Photometry and Final Project sections to the repo.
 
 ##Contact
 *********
